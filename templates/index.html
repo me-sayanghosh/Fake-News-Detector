@@ -4,41 +4,46 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fake News Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+
   <style>
-    /* Define CSS variables for light and dark modes */
     :root {
       --bg-color: #ffffff;
-      --text-color: #2d2d2d;
-      --primary: #8a2be2; /* Violet */
-      --accent: #000000; /* Black */
-      --real: #2ecc71; /* Green */
-      --fake: #e74c3c; /* Red */
-      --container-bg: #f0f0f0;
-      --btn-hover-bg: #7a25d5;
+      --text-color: #1f1f1f;
+      --primary: #6c3bff;
+      --accent: #000000;
+      --real: #2ecc71;
+      --fake: #e74c3c;
+      --container-bg: #f8f8f8;
+      --btn-hover-bg: #5b2ee4;
     }
 
     body.dark {
       --bg-color: #121212;
-      --text-color: #e0e0e0;
-      --primary: #8a2be2; /* Violet */
-      --accent: #ffffff; /* White */
-      --real: #27ae60; /* Green */
-      --fake: #c0392b; /* Red */
-      --container-bg: #242424;
-      --btn-hover-bg: #9b59b6;
+      --text-color: #e6e6e6;
+      --accent: #ffffff;
+      --container-bg: #1f1f1f;
+      --btn-hover-bg: #7e5efc;
     }
 
     body {
       margin: 0;
-      font-family: 'Segoe UI', sans-serif;
+      font-family: 'Inter', sans-serif;
       background: var(--bg-color);
       color: var(--text-color);
+      padding: 30px 10px;
+      min-height: 100vh;
+      transition: background 0.3s ease, color 0.3s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 30px 10px;
-      transition: background 0.3s ease, color 0.3s ease;
-      min-height: 100vh;
+    }
+
+    h1 {
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 20px;
+      letter-spacing: 0.5px;
     }
 
     .container {
@@ -47,61 +52,56 @@
       background: var(--container-bg);
       padding: 25px;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
-      transition: background 0.3s ease, box-shadow 0.3s ease;
-      display: flex;
-      flex-direction: column;
-    }
-
-    body.dark .container {
-      box-shadow: 0 0 15px rgba(255 255 255 / 0.1);
+      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      transition: background 0.3s ease;
     }
 
     textarea {
       width: 100%;
       height: 150px;
       font-size: 1rem;
-      padding: 10px;
+      padding: 12px;
       border: 1px solid #ccc;
       border-radius: 8px;
       margin-bottom: 15px;
-      background: var(--container-bg);
+      background: var(--bg-color);
       color: var(--text-color);
-      transition: background 0.3s ease, color 0.3s ease;
       resize: vertical;
       font-family: inherit;
+      line-height: 1.5;
+      transition: border 0.3s ease, background 0.3s ease;
+    }
+
+    textarea:focus {
+      border-color: var(--primary);
+      outline: none;
     }
 
     .btn {
       background: var(--primary);
       color: white;
-      padding: 10px 20px;
+      padding: 12px;
       font-size: 1rem;
       border: none;
       border-radius: 8px;
       cursor: pointer;
       width: 100%;
       margin-bottom: 15px;
-      transition: background 0.3s ease, transform 0.3s ease, box-shadow 0.3s ease;
-      box-shadow: 0 4px 10px rgba(138,43,226, 0.5);
+      transition: background 0.3s ease;
     }
 
     .btn:hover {
       background: var(--btn-hover-bg);
-      transform: scale(1.05);
-      box-shadow: 0 6px 18px rgba(138,43,226, 0.8);
     }
 
     .detection-result-label {
-      font-weight: 700;
-      font-size: 1.2rem;
+      font-weight: 600;
+      font-size: 1.1rem;
       margin-bottom: 12px;
       color: var(--accent);
-      user-select: none;
       opacity: 0;
-      transform: translateY(10px);
-      animation: fadeSlideUp 0.6s forwards;
-      animation-delay: 0.3s;
+      transform: translateY(5px);
+      animation: fadeSlideUp 0.4s forwards 0.2s;
     }
 
     @keyframes fadeSlideUp {
@@ -111,49 +111,12 @@
       }
     }
 
-    .loader {
-      display: none;
-      justify-content: center;
-      align-items: center;
-      flex-direction: column;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      z-index: 1000;
-    }
-
-    .loader .dots > div {
-      width: 14px;
-      height: 14px;
-      margin: 0 4px;
-      background: white;
-      border-radius: 50%;
-      animation: bounce 0.6s infinite alternate;
-    }
-
-    .loader .dots > div:nth-child(2) {
-      animation-delay: 0.2s;
-    }
-
-    .loader .dots > div:nth-child(3) {
-      animation-delay: 0.4s;
-    }
-
-    @keyframes bounce {
-      0% { transform: translateY(0); }
-      100% { transform: translateY(-16px); }
-    }
-
     .result {
-      padding: 15px;
+      padding: 14px;
       border-radius: 8px;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
       text-align: center;
-      font-weight: bold;
-      animation: fadeIn 0.6s ease;
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      cursor: default;
+      font-weight: 600;
       margin-top: 5px;
       user-select: none;
     }
@@ -161,31 +124,11 @@
     .result.real {
       background: var(--real);
       color: white;
-      box-shadow: 0 0 12px 3px var(--real);
-      transform: scale(1.05);
-      animation: glow 1.5s ease-in-out infinite alternate;
     }
 
     .result.fake {
       background: var(--fake);
       color: white;
-      box-shadow: 0 0 12px 3px var(--fake);
-      transform: scale(1.05);
-      animation: glow 1.5s ease-in-out infinite alternate;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.9); }
-      to { opacity: 1; transform: scale(1); }
-    }
-
-    @keyframes glow {
-      from {
-        box-shadow: 0 0 8px 2px;
-      }
-      to {
-        box-shadow: 0 0 20px 6px;
-      }
     }
 
     .toggle-mode {
@@ -199,18 +142,16 @@
       cursor: pointer;
       display: flex;
       align-items: center;
-      gap: 8px;
+      gap: 6px;
       font-weight: 600;
-      box-shadow: 0 0 10px rgba(0,0,0,0.3);
-      user-select: none;
+      font-size: 0.9rem;
       transition: background-color 0.3s ease, color 0.3s ease;
       z-index: 1100;
     }
 
     .toggle-mode img {
-      width: 20px;
-      height: 20px;
-      display: block;
+      width: 18px;
+      height: 18px;
       filter: invert(1);
       transition: filter 0.3s ease;
     }
@@ -219,42 +160,34 @@
       filter: invert(0);
     }
 
-    /* Bars container */
     .result-bars {
       display: flex;
-      justify-content: center;
-      gap: 20px;
-      margin-top: 20px;
+      gap: 15px;
+      margin-top: 15px;
     }
 
     .bar-container {
       flex: 1;
       text-align: center;
       color: var(--text-color);
-      user-select: none;
     }
 
     .bar-label {
-      font-weight: 700;
-      margin-bottom: 6px;
-      letter-spacing: 0.05em;
+      font-weight: 600;
+      margin-bottom: 5px;
     }
 
     .bar {
-      height: 24px;
-      border-radius: 12px;
+      height: 20px;
+      border-radius: 10px;
       background: #ccc;
-      position: relative;
       overflow: hidden;
-      box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
     }
 
     .bar-fill {
       height: 100%;
-      border-radius: 12px;
       width: 0%;
-      box-shadow: 0 0 10px transparent;
-      transition: box-shadow 0.3s ease;
+      transition: width 1.4s ease;
     }
 
     .bar-fill.real {
@@ -265,131 +198,110 @@
       background: var(--fake);
     }
 
-    /* Animate width from 0 to 100% when .animate is added */
-    .bar-fill.animate.real {
-      animation: fillReal 1.4s forwards;
+    .loader {
+      display: none;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      z-index: 1000;
     }
 
-    .bar-fill.animate.fake {
-      animation: fillFake 1.4s forwards;
+    .loader p {
+      color: white;
+      margin-top: 10px;
+      font-weight: 500;
     }
 
-    @keyframes fillReal {
-      from { width: 0%; box-shadow: 0 0 10px transparent; }
-      to   { width: 100%; box-shadow: 0 0 20px 6px var(--real); }
+    .dots > div {
+      width: 10px;
+      height: 10px;
+      margin: 0 3px;
+      background: white;
+      border-radius: 50%;
+      animation: bounce 0.6s infinite alternate;
     }
 
-    @keyframes fillFake {
-      from { width: 0%; box-shadow: 0 0 10px transparent; }
-      to   { width: 100%; box-shadow: 0 0 20px 6px var(--fake); }
+    .dots > div:nth-child(2) { animation-delay: 0.2s; }
+    .dots > div:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      to { transform: translateY(-8px); }
     }
   </style>
-
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet" />
 </head>
 <body>
 
-  <div class="toggle-mode" onclick="toggleMode()" aria-label="Toggle dark mode" role="button" tabindex="0" onkeydown="event.key==='Enter'&&toggleMode()">
+  <div class="toggle-mode" onclick="toggleMode()">
     <span id="mode-text">Dark Mode</span>
-    <img id="mode-icon" src="https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png" alt="Toggle dark mode icon" />
+    <img id="mode-icon" src="https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png" alt="Toggle dark mode">
   </div>
 
-  <h1>FAKE NEWS DETECTOR</h1>
+  <h1>Fake News Detector</h1>
 
-  <div class="container" role="main">
-    <form id="detect-form" method="POST" action="/predict" onsubmit="showLoader()" aria-label="Fake news detection form">
-      <textarea id="news-textarea" name="news" placeholder="Write down /Paste your news content here..." required aria-label="News content textarea"></textarea>
-      <button type="submit" class="btn" aria-label="Detect news authenticity button">Detect</button>
+  <div class="container">
+    <form id="detect-form" method="POST" action="/predict" onsubmit="showLoader()">
+      <textarea id="news-textarea" name="news" placeholder="Paste your news content here..." required></textarea>
+      <button type="submit" class="btn">Detect</button>
     </form>
 
     {% if prediction %}
-    <div class="detection-result-label" aria-live="polite" aria-atomic="true">DETECTION RESULT</div>
-    <div class="result {{ prediction|lower }}" role="alert" aria-live="polite" aria-atomic="true">
+    <div class="detection-result-label">Detection Result</div>
+    <div class="result {{ prediction|lower }}">
       {{ prediction | upper }}
     </div>
-    <div class="result-bars" aria-label="Prediction result bars">
+    <div class="result-bars">
       <div class="bar-container">
-        <div class="bar-label">REAL</div>
-        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ '100' if prediction|lower=='real' else '0' }}">
-          <div id="bar-real" class="bar-fill real" style="width:0%"></div>
+        <div class="bar-label">Real</div>
+        <div class="bar">
+          <div id="bar-real" class="bar-fill real"></div>
         </div>
       </div>
       <div class="bar-container">
-        <div class="bar-label">FAKE</div>
-        <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{ '100' if prediction|lower=='fake' else '0' }}">
-          <div id="bar-fake" class="bar-fill fake" style="width:0%"></div>
+        <div class="bar-label">Fake</div>
+        <div class="bar">
+          <div id="bar-fake" class="bar-fill fake"></div>
         </div>
       </div>
     </div>
     {% endif %}
   </div>
 
-  <div class="loader" id="loader" aria-hidden="true" role="status" aria-live="polite">
+  <div class="loader" id="loader">
     <div class="dots" style="display: flex;">
       <div></div><div></div><div></div>
     </div>
-    <p style="color:white; margin-top: 10px;">Analyzing...</p>
+    <p>Analyzing...</p>
   </div>
 
   <script>
-    // Clear stored news content on page load so textarea is empty after reload
-    window.addEventListener('load', () => {
-      localStorage.removeItem('newsContent');
-    });
-
-    // Save textarea value on input to localStorage to persist on reload (just in case, but will clear on load)
-    const newsTextarea = document.getElementById('news-textarea');
-    if(newsTextarea) {
-      newsTextarea.addEventListener('input', () => {
-        localStorage.setItem('newsContent', newsTextarea.value);
-      });
-    }
-
     function showLoader() {
       document.getElementById("loader").style.display = "flex";
     }
 
     function toggleMode() {
-      const body = document.body;
-      body.classList.toggle("dark");
+      document.body.classList.toggle("dark");
       const icon = document.getElementById("mode-icon");
       const text = document.getElementById("mode-text");
-      if(body.classList.contains("dark")) {
+      if(document.body.classList.contains("dark")) {
         icon.src = "https://img.icons8.com/ios-filled/50/000000/sun.png";
-        icon.alt = "Toggle light mode icon";
         text.textContent = "Light Mode";
       } else {
         icon.src = "https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png";
-        icon.alt = "Toggle dark mode icon";
         text.textContent = "Dark Mode";
       }
     }
 
-    // Animate bars on page load if prediction exists
     document.addEventListener("DOMContentLoaded", function() {
-      // Assuming template engine adds the prediction variable
       const resultContainer = document.querySelector(".result");
-      if(!resultContainer) return; // no prediction, no animation
-
-      const prediction = resultContainer.classList.contains("real") ? "real" : 
-                         resultContainer.classList.contains("fake") ? "fake" : null;
-
-      if(!prediction) return;
-
-      const barReal = document.getElementById("bar-real");
-      const barFake = document.getElementById("bar-fake");
-
-      if(prediction === "real") {
-        barReal.classList.add("animate", "real");
-        barFake.style.width = "10%";
-      } else if(prediction === "fake") {
-        barFake.classList.add("animate", "fake");
-        barReal.style.width = "10%";
-      }
+      if(!resultContainer) return;
+      const prediction = resultContainer.classList.contains("real") ? "real" : "fake";
+      document.getElementById("bar-real").style.width = prediction === "real" ? "100%" : "10%";
+      document.getElementById("bar-fake").style.width = prediction === "fake" ? "100%" : "10%";
     });
-
   </script>
-
 </body>
 </html>
-
