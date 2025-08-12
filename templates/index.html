@@ -4,72 +4,75 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fake News Detector</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
 
   <style>
+    /* Light theme variables */
     :root {
-      --bg-color: #ffffff;
+      --bg-color: #f5f5f5;
       --text-color: #1f1f1f;
-      --primary: #6c3bff;
-      --accent: #000000;
+      --card-bg: #ffffff;
+      --primary: #6200ee;
+      --primary-hover: #4b00b8;
       --real: #2ecc71;
       --fake: #e74c3c;
-      --container-bg: #f8f8f8;
-      --btn-hover-bg: #5b2ee4;
+      --bar-bg: #e0e0e0;
     }
 
+    /* Dark theme overrides */
     body.dark {
       --bg-color: #121212;
-      --text-color: #e6e6e6;
-      --accent: #ffffff;
-      --container-bg: #1f1f1f;
-      --btn-hover-bg: #7e5efc;
+      --text-color: #eeeeee;
+      --card-bg: #1e1e1e;
+      --bar-bg: #2a2a2a;
+      --primary-hover: #7e3ff2;
     }
 
     body {
       margin: 0;
-      font-family: 'Inter', sans-serif;
       background: var(--bg-color);
       color: var(--text-color);
-      padding: 30px 10px;
-      min-height: 100vh;
+      font-family: 'Inter', sans-serif;
       transition: background 0.3s ease, color 0.3s ease;
       display: flex;
       flex-direction: column;
       align-items: center;
+      padding: 40px 15px;
+      min-height: 100vh;
     }
 
     h1 {
+      font-family: 'Roboto', sans-serif;
       font-weight: 700;
-      font-size: 2rem;
-      margin-bottom: 20px;
-      letter-spacing: 0.5px;
+      margin-bottom: 25px;
+      font-size: 1.9rem;
     }
 
-    .container {
-      max-width: 600px;
+    .card {
+      background: var(--card-bg);
       width: 100%;
-      background: var(--container-bg);
-      padding: 25px;
+      max-width: 600px;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.05);
+      box-shadow: 0 3px 8px rgba(0,0,0,0.12);
+      padding: 25px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
       transition: background 0.3s ease;
     }
 
     textarea {
       width: 100%;
-      height: 150px;
-      font-size: 1rem;
+      height: 140px;
       padding: 12px;
+      font-size: 1rem;
+      border-radius: 6px;
       border: 1px solid #ccc;
-      border-radius: 8px;
-      margin-bottom: 15px;
       background: var(--bg-color);
       color: var(--text-color);
-      resize: vertical;
       font-family: inherit;
-      line-height: 1.5;
-      transition: border 0.3s ease, background 0.3s ease;
+      resize: vertical;
+      transition: border-color 0.3s ease;
     }
 
     textarea:focus {
@@ -79,46 +82,33 @@
 
     .btn {
       background: var(--primary);
-      color: white;
-      padding: 12px;
-      font-size: 1rem;
+      color: #fff;
       border: none;
-      border-radius: 8px;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 1rem;
+      font-weight: 500;
       cursor: pointer;
-      width: 100%;
-      margin-bottom: 15px;
-      transition: background 0.3s ease;
+      transition: background 0.3s ease, box-shadow 0.3s ease;
     }
 
     .btn:hover {
-      background: var(--btn-hover-bg);
+      background: var(--primary-hover);
+      box-shadow: 0 2px 8px rgba(98, 0, 238, 0.4);
     }
 
-    .detection-result-label {
+    .result-label {
       font-weight: 600;
-      font-size: 1.1rem;
-      margin-bottom: 12px;
-      color: var(--accent);
-      opacity: 0;
-      transform: translateY(5px);
-      animation: fadeSlideUp 0.4s forwards 0.2s;
-    }
-
-    @keyframes fadeSlideUp {
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      font-size: 1.05rem;
+      margin-top: 8px;
     }
 
     .result {
       padding: 14px;
       border-radius: 8px;
-      font-size: 1.1rem;
-      text-align: center;
+      font-size: 1.05rem;
       font-weight: 600;
-      margin-top: 5px;
-      user-select: none;
+      text-align: center;
     }
 
     .result.real {
@@ -131,137 +121,130 @@
       color: white;
     }
 
-    .toggle-mode {
-      position: fixed;
-      top: 20px;
-      right: 20px;
-      background: var(--accent);
-      color: var(--bg-color);
-      padding: 6px 12px;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: background-color 0.3s ease, color 0.3s ease;
-      z-index: 1100;
-    }
-
-    .toggle-mode img {
-      width: 18px;
-      height: 18px;
-      filter: invert(1);
-      transition: filter 0.3s ease;
-    }
-
-    body.dark .toggle-mode img {
-      filter: invert(0);
-    }
-
+    /* Progress bars */
     .result-bars {
       display: flex;
-      gap: 15px;
-      margin-top: 15px;
+      gap: 12px;
+      margin-top: 12px;
     }
 
     .bar-container {
       flex: 1;
       text-align: center;
-      color: var(--text-color);
     }
 
     .bar-label {
-      font-weight: 600;
-      margin-bottom: 5px;
+      font-size: 0.85rem;
+      font-weight: 500;
+      margin-bottom: 4px;
     }
 
     .bar {
-      height: 20px;
-      border-radius: 10px;
-      background: #ccc;
+      height: 18px;
+      background: var(--bar-bg);
+      border-radius: 9px;
       overflow: hidden;
     }
 
     .bar-fill {
       height: 100%;
       width: 0%;
-      transition: width 1.4s ease;
+      transition: width 1s ease;
     }
 
-    .bar-fill.real {
-      background: var(--real);
-    }
+    .bar-fill.real { background: var(--real); }
+    .bar-fill.fake { background: var(--fake); }
 
-    .bar-fill.fake {
-      background: var(--fake);
-    }
-
+    /* Loader */
     .loader {
       display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
       justify-content: center;
       align-items: center;
       flex-direction: column;
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0, 0, 0, 0.6);
       z-index: 1000;
+    }
+
+    .dots {
+      display: flex;
+      gap: 5px;
+    }
+
+    .dots div {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: white;
+      animation: bounce 0.6s infinite alternate;
+    }
+
+    .dots div:nth-child(2) { animation-delay: 0.2s; }
+    .dots div:nth-child(3) { animation-delay: 0.4s; }
+
+    @keyframes bounce {
+      to { transform: translateY(-6px); }
     }
 
     .loader p {
       color: white;
-      margin-top: 10px;
-      font-weight: 500;
+      font-size: 0.95rem;
+      margin-top: 8px;
     }
 
-    .dots > div {
-      width: 10px;
-      height: 10px;
-      margin: 0 3px;
-      background: white;
+    /* Dark mode toggle FAB */
+    .toggle-mode {
+      position: fixed;
+      bottom: 25px;
+      right: 25px;
+      background: var(--primary);
+      color: white;
+      padding: 12px;
       border-radius: 50%;
-      animation: bounce 0.6s infinite alternate;
+      cursor: pointer;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.3s ease;
     }
 
-    .dots > div:nth-child(2) { animation-delay: 0.2s; }
-    .dots > div:nth-child(3) { animation-delay: 0.4s; }
+    .toggle-mode img {
+      width: 20px;
+      height: 20px;
+      filter: invert(1);
+    }
 
-    @keyframes bounce {
-      to { transform: translateY(-8px); }
+    .toggle-mode:hover {
+      background: var(--primary-hover);
     }
   </style>
 </head>
 <body>
 
-  <div class="toggle-mode" onclick="toggleMode()">
-    <span id="mode-text">Dark Mode</span>
-    <img id="mode-icon" src="https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png" alt="Toggle dark mode">
-  </div>
-
   <h1>Fake News Detector</h1>
 
-  <div class="container">
-    <form id="detect-form" method="POST" action="/predict" onsubmit="showLoader()">
-      <textarea id="news-textarea" name="news" placeholder="Paste your news content here..." required></textarea>
+  <div class="card">
+    <form method="POST" action="/predict" onsubmit="showLoader()">
+      <textarea name="news" placeholder="Paste or write your news content here..." required></textarea>
       <button type="submit" class="btn">Detect</button>
     </form>
 
     {% if prediction %}
-    <div class="detection-result-label">Detection Result</div>
+    <div class="result-label">Detection Result</div>
     <div class="result {{ prediction|lower }}">
       {{ prediction | upper }}
     </div>
     <div class="result-bars">
       <div class="bar-container">
-        <div class="bar-label">Real</div>
+        <div class="bar-label">REAL</div>
         <div class="bar">
           <div id="bar-real" class="bar-fill real"></div>
         </div>
       </div>
       <div class="bar-container">
-        <div class="bar-label">Fake</div>
+        <div class="bar-label">FAKE</div>
         <div class="bar">
           <div id="bar-fake" class="bar-fill fake"></div>
         </div>
@@ -270,11 +253,17 @@
     {% endif %}
   </div>
 
+  <!-- Loader -->
   <div class="loader" id="loader">
-    <div class="dots" style="display: flex;">
+    <div class="dots">
       <div></div><div></div><div></div>
     </div>
     <p>Analyzing...</p>
+  </div>
+
+  <!-- Dark mode toggle FAB -->
+  <div class="toggle-mode" onclick="toggleMode()">
+    <img id="mode-icon" src="https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png" alt="Toggle dark mode">
   </div>
 
   <script>
@@ -285,22 +274,19 @@
     function toggleMode() {
       document.body.classList.toggle("dark");
       const icon = document.getElementById("mode-icon");
-      const text = document.getElementById("mode-text");
       if(document.body.classList.contains("dark")) {
-        icon.src = "https://img.icons8.com/ios-filled/50/000000/sun.png";
-        text.textContent = "Light Mode";
+        icon.src = "https://img.icons8.com/ios-filled/50/ffffff/sun.png";
       } else {
         icon.src = "https://img.icons8.com/ios-filled/50/ffffff/moon-symbol.png";
-        text.textContent = "Dark Mode";
       }
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-      const resultContainer = document.querySelector(".result");
-      if(!resultContainer) return;
-      const prediction = resultContainer.classList.contains("real") ? "real" : "fake";
-      document.getElementById("bar-real").style.width = prediction === "real" ? "100%" : "10%";
-      document.getElementById("bar-fake").style.width = prediction === "fake" ? "100%" : "10%";
+      const result = document.querySelector(".result");
+      if(!result) return;
+      const isReal = result.classList.contains("real");
+      document.getElementById("bar-real").style.width = isReal ? "100%" : "10%";
+      document.getElementById("bar-fake").style.width = isReal ? "10%" : "100%";
     });
   </script>
 </body>
