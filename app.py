@@ -1,11 +1,13 @@
+import os
 from flask import Flask, request, render_template
 import pickle
-import os
 
-app = Flask(__name__)
-
-# Base directory
 BASE_DIR = os.path.dirname(__file__)
+
+app = Flask(
+    __name__,
+    template_folder=os.path.join(BASE_DIR, 'templates'),
+)
 
 # Load model and vectorizer
 try:
@@ -14,10 +16,7 @@ try:
     with open(os.path.join(BASE_DIR, 'vectorizer.pkl'), 'rb') as vec_file:
         vectorizer = pickle.load(vec_file)
 except FileNotFoundError as e:
-    print("❌ Model/vectorizer file not found.")
-    raise e
-except Exception as e:
-    print("❌ Error loading model/vectorizer.")
+    print("❌ Error: Model or vectorizer file not found.")
     raise e
 
 @app.route('/')
@@ -30,7 +29,6 @@ def predict():
         news = request.form['news']
         if not news.strip():
             return render_template('index.html', prediction="⚠️ Please enter some news content.")
-
         data = vectorizer.transform([news])
         prediction = model.predict(data)[0]
         label = "✅ Real News" if prediction == 1 else "❌ Fake News"
